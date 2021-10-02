@@ -1,112 +1,87 @@
+var socket = io();
 
-var side = 20;
+var side = 10;
+var matrix = []
+// let grassCountElement = document.getElementById('grassCount');
+// let grassEaterCountElement = document.getElementById('grassEaterCount');
 
-let matrix = []; 
-let rows = 25; 
-let columns = 25; 
 
-for (let y = 0; y < rows; y++) {
-    matrix[y] = []; 
-    for (let x = 0; x < columns; x++) {
-        let a = Math.floor(Math.random() * 100);
-        if (a >= 0 && a < 40) {
-            matrix[y][x] = 0; 
-        }
-        else if (a >= 40 && a < 60) {
-            matrix[y][x] = 1; 
-        }
-        else if (a >= 60 && a < 75) {
-            matrix[y][x] = 2; 
-        }
-        else if (a >= 75 && a < 90) {
-            matrix[y][x] = 3; 
-        }
-        else if (a >= 90 && a < 93) {
-            matrix[y][x] = 4; 
-        }
-        else if (a >= 93 && a < 100) {
-            matrix[y][x] = 5; 
-        }
-    }
-}
-
+var weath = 'summer'
 function setup() {
-    frameRate(7);
-    createCanvas(matrix[0].length * side, matrix.length * side);
-    background('#acacac');
+    createCanvas(50 * side, 50 * side);
+    background("pink");
+
+    let grassElementCount = document.getElementById('grassCount');
+    let grasseaterElementCount = document.getElementById('grasseaterCount');
+    let gishatichElementCount = document.getElementById('gishatichCount');
+    let anicvacdagaxElementCount = document.getElementById('anicvacdagaxCount');
+    let crichElementCount = document.getElementById('crichCount');
 
 
+socket.on("weather", function (data) {
+    weath = data;
+})
+
+socket.on('data', nkarel)
+
+function nkarel(data) {
+    console.log(data);
+    matrix = data.matrix
+    grassElementCount.innerText = data.grassCount;
+    grasseaterElementCount.innerText = data.grasseaterCount;
+    gishatichElementCount.innerText = data.gishatichCount;
+    anicvacdagaxElementCount.innerText = data.anicvacdagaxCount;
+    crichElementCount.innerText = data.crichCount;
     for (var y = 0; y < matrix.length; y++) {
-        for (var x = 0; x < matrix[y].length; x++) {
-            if (matrix[y][x] == 1) {
-                matrix[y][x] = new Grass(x, y, 1);
-            }
-            else if (matrix[y][x] == 2) {
-                matrix[y][x] = new GrassEater(x, y, 2);
-            }
-            else if (matrix[y][x] == 3) {
-                matrix[y][x] = new Gishatich(x, y, 3);
-            }
-            else if (matrix[y][x] == 4) {
-                matrix[y][x] = new Anicvacdagax(x, y, 4);
-            }
-            else if (matrix[y][x] == 5) {
-                matrix[y][x] = new Crich(x, y, 5);
-            }
-        }
-    }
-
-}
-
-
-function draw() {
-    console.log(matrix);
-    for (var y = 0; y < matrix.length; y++) {
-        for (var x = 0; x < matrix[y].length; x++) {
+        for (var x = 0; x < matrix[0].length; x++) {
             var obj = matrix[y][x];
-            console.log(obj)
-            if (obj.index == 1) {
-                obj.mul();
-            }
-            else if (obj.index == 2) {
-                obj.eat();
-            }
-            else if (obj.index == 3) {
-                obj.eat();
-            }
-            else if (obj.index == 4) {
-                obj.eat();
-            }
-
-      else if (obj.index == 5) {
-                obj.spred();
-            }
-        }
-    }
-
-    background("#acacac");
-
-    for (var y = 0; y < matrix.length; y++) {
-        for (var x = 0; x < matrix[y].length; x++) {
-            var obj = matrix[y][x];
-
-            if (obj.index == 1) {
+            if (obj == 1){
+                if(weath == "summer") {
                 fill("green");
+            }else if (weath == "autumn") {
+                fill("#333300");
+            }else if (weath == "winter") {
+                fill("white");
+            }else if (weath == "spring") {
+                fill("#4dffa6");
             }
-            else if (obj.index == 2) {
+        }else if (obj == 2) {
                 fill("yellow");
+            }else if (obj == 0){
+                fill("grey")
+            }else if(obj == 3){
+                fill("red")
+            }else if(obj == 4){
+                fill("cyan")
+            }else if(obj == 5){
+                fill("orange")
             }
-            else if (obj.index == 3) {
-                fill("red");
-            }
-            else if (obj.index == 4) {
-                fill("black");
-            } 
-            else if (obj.index == 5) {
-                fill("orange");
-            }
-            
+
             rect(x * side, y * side, side, side);
         }
     }
 }
+
+}
+
+
+function kill() {
+    
+    socket.emit("kill")
+}
+function addGrass() {
+    socket.emit("add grass")
+}
+function addGrassEater() {
+    socket.emit("add grassEater")
+}
+function addGishatich() {
+    socket.emit("add Gishatich")
+}
+function addAnicvacDagax() {
+    socket.emit("add AnicvacDagax")
+}
+function addCrich() {
+    socket.emit("add Crich")
+}
+

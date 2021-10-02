@@ -1,152 +1,104 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-	<title>Game of life</title>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.12/p5.min.js"></script>
-	<script type="text/javascript" src="class.js"></script>
-	<script type="text/javascript" src="script.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.14/p5.js"></script>
+    <script src="script.js"></script>
+<style>
+ul li{
+list-style: none;
+display: inline-block;
+}
+
+</style>
+
+
+
+</title>
+
 </head>
+
 <body>
-	<table>
-        <tr id="first">
-            <td class="alice"></td>
-            <td class="alice">գույն</td>
-            <td class="alice">նախնական ինֆորմացիա</td>
-            <td class="alice">էներգիա</td>
-            <td class="alice">բազմացման ինֆորմացիա</td>
-            <td class="alice">էներգիան հետևյալն է</td>
-            <td class="alice">հատուկ բնութագրիչներ</td>
-        </tr>
-        <tr>
-            <td id="grey"></td>
-            <td>
-                <p>մոխրագույն</p>
-            </td>
-            <td>
-                <p> դատարկ վանդակ</p>
-            </td>
-            <td>
-                <p>-</p>
-            </td>
-            <td>չի բազմանում</td>
-            <td>
-                <p>Էներգիա չունի</p>
-            </td>
-            <td>
-                <p>բնութագիր չունի</p>
-            </td>
-        </tr>
+    <div style="text-align: center;">
+        <h1>Ծրագրավորում III Երևան</h1>
+        <h2>Գոռ Դավթյան</h2>
 
-        <tr>
-            <td id="green"></td>
-            <td>
-                <p>կանաչ</p>
-            </td>
-            <td>
-                <p>խոտ է</p>
-            </td>
-            <td>
-                <p>-</p>
-            </td>
-            <td>
-                <p>կարոխ է բազմանալ 8 վանդակներում</p>
-            </td>
-            <td>
-                <p>էներգիա չունի</p>
-            </td>
-            <td>
-                <p>կարող է անցնել սևի վրայով</p>
-            </td>
-        </tr>
+    </div>
+    <div class="tools">
+        <h1 style="color:rgb(189, 240, 255)">Events</h1>
+        <ul>
+            <li>
+                <button onclick="kill()">Kill them all</button>
+            </li>
+            <li>
+                <button onclick="addGrass()">Add grass</button>
+            </li>
+            <li>
+                <button onclick="addGrassEater()">Add grass eater</button>
+            </li>
+            <li>
+                <button onclick="addGishatich()">Add gishatich</button>
+            </li>
+            <li>
+                <button onclick="addAnicvacDagax()">Add anicvac dagax</button>
+            </li>
+            <li>
+                <button onclick="addCrich()">Add crich</button>
+            </li>
+        </ul>
+    </div>
 
-        <tr>
-            <td id="yellow"></td>
-            <td>
-                <p>դեղին</p>
-            </td>
-            <td>
-                <p>խոտակեր է</p>
-            </td>
-            <td>
-                <p>12</p>
-            </td>
-            <td>
-                <p>բազմանւմ է երբ էներգիան >= 1</p>
-            </td>
-            <td>
-                <p>ուտում է խոտեր</p>
-            </td>
-            <td>
-                <p>Կարող է քայլել կանաչի վրա, և այն դարձնել դեղին</p>
-            </td>
-        </tr>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Գույն</th>
+                <th scope="col">Նկարագրություն</th>
+                <th scope="col">Ծնվել է</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td scope="row" style="background-color:green;"></td>
+                <td>Կանաչը խոտն է, որը բազմանում է N ցիկլը մեկ,մահանում է երբ նրան ուտում է խոտակերը, կամ այրում է
+                    կրակը, կամ նրան կոխկրտում է գիշատիչը</td>
+                <td id="grassCount"></td>
+            </tr>
+            <tr>
+                <th scope="row">2</th>
+                <td scope="row" style="background-color:rgb(241, 241, 0);"></td>
+                <td>Դեղինը խոտակերն է, որը բազմանում է N հատ խոտ ուտելուց հետո և մահանում է N հատ չուտելուց հետո, կամ
+                    երբ նրան ուտում է գիշատիչը, կամ երբ նրան այրում է կրակը:</td>
+                <td id="grasseaterCount"></td>
+            </tr>
+            <tr>
+                <th scope="row">3</th>
+                <td scope="row" style="background-color:cyan;"></td>
+                <td>Կապույտը դագաղն է, որի վրա կանգնելով կերպարը մահանում է:</td>
+                <td id="gishatichCount"></td>
+            </tr>
+            <tr>
+                <th scope="row">4</th>
+                <td scope="row" style="background-color:orange;"></td>
+                <td>Նարնջագույնը ցրող սարք է և եռբ նրա էներգիան հասնում է որոշակի թվի նա բազմացնում է խոտ, խոտակեր, և գիշատիչ: </td>
+                <td id="anicvacdagaxCount"></td>
+            </tr>
+            <tr>
+                <th scope="row">5</th>
+                <td scope="row" style="background-color:red;"></td>
+                <td>Կարմիրը գիշատիչն է, որը բազմանում է N հատ խոտակեր ուտելուց հետո և մահանում է N հատ չուտելուց հետո, կամ
+                    երբ նա կանգնում է դագաղի վռա և մահանում է:</td>
+                <td id="crichCount"></td>
+            </tr>
+        </tbody>
+    </table>
 
-        <tr>
-            <td id="red"></td>
-            <td>
-                <p>Red</p>
-            </td>
-            <td>
-                <p>գիշատիչ</p>
-            </td>
-            <td>
-                <p>3</p>
-            </td>
-            <td>
-                <p>Բազմանում է, երբ էներգիան հասնում է 10-ի</p>
-            </td>
-            <td>
-                <p>ուտում է խոտակերներին</p>
-            </td>
-            <td>
-                <p>Can walk on Damaged Soil and make it White; <br> Walks on Grass without obtaining Energy</p>
-            </td>
-        </tr>
+</body>
 
-        <tr>
-            <td id="black"></td>
-            <td>
-                <p>սև</p>
-            </td>
-            <td>
-                <p>մահացու քար</p>
-            </td>
-            <td>
-                <p>-</p>
-            </td>
-            <td>
-                <p>չի բազմանում</p>
-            </td>
-            <td>
-                <p>էներգիա չունի</p>
-            </td>
-            <td>
-                <p>Հայտնվում է պատահականորեն;
-                    <br>դիպչելով նրան մահանում ես</p>
-            </td>
-        </tr>
-
-        <tr>
-            <td id="orange"></td>
-            <td>
-                <p>նարնջագույն</p>
-            </td>
-            <td>
-                <p>բազմացնում է հերոսներին</p>
-            </td>
-            <td>
-                <p>-</p>
-            </td>
-            <td>
-                <p>չի բազմանում</p>
-            </td>
-            <td>
-                <p>էներգիա չունի</p>
-            </td>
-            <td>
-                <p>խոտը նրա վրա չի կարող բազմանալ</p>
-            </td>
-        </tr>
-
-        <tr>
-            
+</html>
